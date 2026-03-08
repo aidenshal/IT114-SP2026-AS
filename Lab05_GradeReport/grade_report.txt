@@ -1,0 +1,7 @@
+Name	Average	Status
+--------------------------------
+Alice	89.0	Pass
+Bob	59.0	Fail
+Charlie	78.3	Pass
+Diana	97.7	Pass
+Evan	40.0	Fail
