@@ -5,19 +5,16 @@ public class SavingsAccount extends BankAccount {
     }
 
     @Override
-    public void withdraw(double amount) {
-        if (amount <= 0) {
-            System.out.println("Withdrawal amount must be positive.");
-            System.out.printf("New Balance: $%.2f%n", getBalance());
-            return;
+    public String withdraw(double amount) {
+        if (Double.isNaN(amount) || amount <= 0) {
+            return "Please enter a valid number";
         }
 
         if (amount > getBalance()) {
-            System.out.println("Transaction Denied: Insufficient funds");
-        } else {
-            setBalance(getBalance() - amount);
+            return String.format("Transaction Denied: Insufficient funds. Balance remains: $%.2f", getBalance());
         }
 
-        System.out.printf("New Balance: $%.2f%n", getBalance());
+        setBalance(getBalance() - amount);
+        return String.format("Withdrawal successful. New Balance: $%.2f", getBalance());
     }
 }

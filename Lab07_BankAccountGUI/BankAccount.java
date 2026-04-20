@@ -8,19 +8,19 @@ public abstract class BankAccount {
         this.balance = initialDeposit;
     }
 
-    public void deposit(double amount) {
-        if (amount > 0) {
-            balance += amount;
-            System.out.printf("New Balance: $%.2f%n", balance);
-        } else {
-            System.out.println("Deposit amount must be positive.");
+    public String deposit(double amount) {
+        if (amount <= 0) {
+            return "Please enter a valid number";
         }
+
+        balance += amount;
+        return String.format("Deposit successful. New Balance: $%.2f", balance);
     }
 
     /**
      * Abstract method: Child classes must implement this.
      */
-    public abstract void withdraw(double amount);
+    public abstract String withdraw(double amount);
 
     // --- GETTERS AND SETTERS ---
 

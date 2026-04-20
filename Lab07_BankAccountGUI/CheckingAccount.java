@@ -7,21 +7,20 @@ public class CheckingAccount extends BankAccount {
     }
 
     @Override
-    public void withdraw(double amount) {
-        if (amount <= 0) {
-            System.out.println("Withdrawal amount must be positive.");
-            System.out.printf("New Balance: $%.2f%n", getBalance());
-            return;
+    public String withdraw(double amount) {
+        if (Double.isNaN(amount) || amount <= 0) {
+            return "Please enter a valid number";
         }
 
         double newBalance = getBalance() - amount;
 
-        if (newBalance < 0) {
+        if (amount > getBalance()) {
             newBalance -= OVERDRAFT_FEE;
-            System.out.println("Overdraft! $35.00 fee");
+            setBalance(newBalance);
+            return String.format("Overdraft! $35.00 fee applied. New Balance: $%.2f", getBalance());
         }
 
         setBalance(newBalance);
-        System.out.printf("New Balance: $%.2f%n", getBalance());
+        return String.format("Withdrawal successful. New Balance: $%.2f", getBalance());
     }
 }
