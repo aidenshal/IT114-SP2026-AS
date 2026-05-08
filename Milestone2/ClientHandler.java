@@ -50,6 +50,11 @@ public class ClientHandler extends Thread {
                     break;
                 }
 
+                if (message.equalsIgnoreCase("/history")) {
+                    sendChatHistory();
+                    continue;
+                }
+
                 // DM format: /dm username message here
                 if (message.startsWith("/dm ")) {
                     String[] parts = message.split(" ", 3);
@@ -70,6 +75,24 @@ public class ClientHandler extends Thread {
         } finally {
             ChatServer.removeClient(username);
             closeEverything();
+        }
+    }
+
+    private void sendChatHistory() {
+        File logFile = new File("chat_log.txt");
+
+        if (!logFile.exists() || logFile.length() == 0) {
+            sendMessage("SERVER: No chat history available.");
+            return;
+        }
+
+        try (BufferedReader fileReader = new BufferedReader(new FileReader(logFile))) {
+            String line;
+            while ((line = fileReader.readLine()) != null) {
+                sendMessage(line);
+            }
+        } catch (IOException e) {
+            sendMessage("SERVER: Error reading chat history.");
         }
     }
 
