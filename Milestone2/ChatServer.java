@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatServer {
@@ -43,7 +42,17 @@ public class ChatServer {
         }
     }
 
+    public static synchronized void saveMessage(String message) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("chat_log.txt", true))) {
+            writer.println(message);
+        } catch (IOException e) {
+            System.out.println("Error saving message: " + e.getMessage());
+        }
+    }
+
     public static void broadcast(String message) {
+        saveMessage(message);
+
         for (ClientHandler client : clients.values()) {
             client.sendMessage(message);
         }
@@ -54,6 +63,8 @@ public class ChatServer {
         ClientHandler source = clients.get(sender);
 
         if (target != null) {
+            saveMessage("[DM " + sender + " -> " + recipient + "]: " + message);
+
             target.sendMessage("[DM from " + sender + "]: " + message);
             if (source != null) {
                 source.sendMessage("[DM to " + recipient + "]: " + message);
