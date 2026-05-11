@@ -9,6 +9,20 @@ public class ChatServer {
     // username -> handler
     private static final ConcurrentHashMap<String, ClientHandler> clients = new ConcurrentHashMap<>();
 
+    private static class RPSGame {
+        String player1;
+        String player2;
+        String player1Move;
+        String player2Move;
+
+        RPSGame(String player1, String player2) {
+            this.player1 = player1;
+            this.player2 = player2;
+        }
+    }
+
+    private static final ConcurrentHashMap<String, RPSGame> activeRPSGames = new ConcurrentHashMap<>();
+
     public static void main(String[] args) {
         System.out.println("Server starting on port " + PORT);
 
@@ -74,6 +88,26 @@ public class ChatServer {
                 source.sendMessage("SERVER: User '" + recipient + "' not found.");
             }
         }
+    }
+
+    public static synchronized void startRPSChallenge(String sender, String recipient) {
+        ClientHandler target = clients.get(recipient);
+        ClientHandler source = clients.get(sender);
+
+        if (target == null) {
+            if (source != null) {
+                source.sendMessage("SERVER: User '" + recipient + "' not found.");
+            }
+            return;
+        }
+
+        RPSGame game = new RPSGame(sender, recipient);
+
+        activeRPSGames.put(sender, game);
+        activeRPSGames.put(recipient, game);
+
+        source.sendMessage("SERVER: RPS challenge started with " + recipient + ".");
+        target.sendMessage("SERVER: RPS challenge started with " + sender + ".");
     }
 
     public static void sendUserListToAll() {

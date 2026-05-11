@@ -55,6 +55,19 @@ public class ClientHandler extends Thread {
                     continue;
                 }
 
+                if (message.startsWith("/rps challenge ")) {
+                    String[] parts = message.split(" ", 3);
+
+                    if (parts.length < 3) {
+                        sendMessage("SERVER: Usage -> /rps challenge username");
+                    } else {
+                        String opponent = parts[2];
+                        ChatServer.startRPSChallenge(username, opponent);
+                    }
+
+                    continue;
+                }
+
                 // DM format: /dm username message here
                 if (message.startsWith("/dm ")) {
                     String[] parts = message.split(" ", 3);
