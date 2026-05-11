@@ -38,7 +38,7 @@ Simple Java socket chatroom project for IT114 using client/server networking.
 Example:
 
 ```text
-/dm Omar hello
+/dm Rick hello
 ```
 
 ---
