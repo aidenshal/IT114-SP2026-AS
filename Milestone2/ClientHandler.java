@@ -68,13 +68,39 @@ public class ClientHandler extends Thread {
                     continue;
                 }
 
-                if (message.startsWith("/rps ")) {
-                    String[] parts = message.split(" ", 2);
+                if (message.startsWith("/rps accept ")) {
+                    String[] parts = message.split(" ", 3);
 
-                    if (parts.length < 2) {
-                        sendMessage("SERVER: Usage -> /rps rock, /rps paper, or /rps scissors");
+                    if (parts.length < 3) {
+                        sendMessage("SERVER: Usage -> /rps accept username");
                     } else {
-                        String move = parts[1].toLowerCase();
+                        String challenger = parts[2];
+                        ChatServer.acceptRPSChallenge(username, challenger);
+                    }
+
+                    continue;
+                }
+
+                if (message.startsWith("/rps decline ")) {
+                    String[] parts = message.split(" ", 3);
+
+                    if (parts.length < 3) {
+                        sendMessage("SERVER: Usage -> /rps decline username");
+                    } else {
+                        String challenger = parts[2];
+                        ChatServer.declineRPSChallenge(username, challenger);
+                    }
+
+                    continue;
+                }
+
+                if (message.startsWith("/rps move ")) {
+                    String[] parts = message.split(" ", 3);
+
+                    if (parts.length < 3) {
+                        sendMessage("SERVER: Usage -> /rps move rock, /rps move paper, or /rps move scissors");
+                    } else {
+                        String move = parts[2].toLowerCase();
                         ChatServer.submitRPSMove(username, move);
                     }
 

@@ -14,10 +14,12 @@ public class ChatServer {
         String player2;
         String player1Move;
         String player2Move;
+        boolean accepted;
 
         RPSGame(String player1, String player2) {
             this.player1 = player1;
             this.player2 = player2;
+            this.accepted = false;
         }
     }
 
@@ -106,8 +108,55 @@ public class ChatServer {
         activeRPSGames.put(sender, game);
         activeRPSGames.put(recipient, game);
 
-        source.sendMessage("SERVER: RPS challenge started with " + recipient + ".");
-        target.sendMessage("SERVER: RPS challenge started with " + sender + ".");
+        source.sendMessage("SERVER: RPS challenge sent to " + recipient + ".");
+        target.sendMessage("SERVER: " + sender + " challenged you to RPS. Type /rps accept " + sender + " or /rps decline " + sender + ".");
+    }
+
+    public static synchronized void acceptRPSChallenge(String player, String challenger) {
+        RPSGame game = activeRPSGames.get(player);
+        ClientHandler playerHandler = clients.get(player);
+        ClientHandler challengerHandler = clients.get(challenger);
+
+        if (game == null || !game.player1.equals(challenger) || !game.player2.equals(player)) {
+            if (playerHandler != null) {
+                playerHandler.sendMessage("SERVER: No pending RPS challenge from " + challenger + ".");
+            }
+            return;
+        }
+
+        game.accepted = true;
+
+        if (playerHandler != null) {
+            playerHandler.sendMessage("SERVER: You accepted the RPS challenge from " + challenger + ". Use /rps move rock, /rps move paper, or /rps move scissors.");
+        }
+
+        if (challengerHandler != null) {
+            challengerHandler.sendMessage("SERVER: " + player + " accepted your RPS challenge. Use /rps move rock, /rps move paper, or /rps move scissors.");
+        }
+    }
+
+    public static synchronized void declineRPSChallenge(String player, String challenger) {
+        RPSGame game = activeRPSGames.get(player);
+        ClientHandler playerHandler = clients.get(player);
+        ClientHandler challengerHandler = clients.get(challenger);
+
+        if (game == null || !game.player1.equals(challenger) || !game.player2.equals(player)) {
+            if (playerHandler != null) {
+                playerHandler.sendMessage("SERVER: No pending RPS challenge from " + challenger + ".");
+            }
+            return;
+        }
+
+        activeRPSGames.remove(game.player1);
+        activeRPSGames.remove(game.player2);
+
+        if (playerHandler != null) {
+            playerHandler.sendMessage("SERVER: You declined the RPS challenge from " + challenger + ".");
+        }
+
+        if (challengerHandler != null) {
+            challengerHandler.sendMessage("SERVER: " + player + " declined your RPS challenge.");
+        }
     }
 
     public static synchronized void submitRPSMove(String player, String move) {
@@ -115,7 +164,7 @@ public class ChatServer {
 
         if (!move.equals("rock") && !move.equals("paper") && !move.equals("scissors")) {
             if (source != null) {
-                source.sendMessage("SERVER: Invalid move. Use /rps rock, /rps paper, or /rps scissors.");
+                source.sendMessage("SERVER: Invalid move. Use /rps move rock, /rps move paper, or /rps move scissors.");
             }
             return;
         }
@@ -125,6 +174,13 @@ public class ChatServer {
         if (game == null) {
             if (source != null) {
                 source.sendMessage("SERVER: You are not in an active RPS challenge.");
+            }
+            return;
+        }
+
+        if (!game.accepted) {
+            if (source != null) {
+                source.sendMessage("SERVER: RPS challenge has not been accepted yet.");
             }
             return;
         }
