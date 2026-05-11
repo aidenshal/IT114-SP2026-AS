@@ -68,6 +68,19 @@ public class ClientHandler extends Thread {
                     continue;
                 }
 
+                if (message.startsWith("/rps ")) {
+                    String[] parts = message.split(" ", 2);
+
+                    if (parts.length < 2) {
+                        sendMessage("SERVER: Usage -> /rps rock, /rps paper, or /rps scissors");
+                    } else {
+                        String move = parts[1].toLowerCase();
+                        ChatServer.submitRPSMove(username, move);
+                    }
+
+                    continue;
+                }
+
                 // DM format: /dm username message here
                 if (message.startsWith("/dm ")) {
                     String[] parts = message.split(" ", 3);

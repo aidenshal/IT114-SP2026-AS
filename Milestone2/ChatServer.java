@@ -110,6 +110,66 @@ public class ChatServer {
         target.sendMessage("SERVER: RPS challenge started with " + sender + ".");
     }
 
+    public static synchronized void submitRPSMove(String player, String move) {
+        ClientHandler source = clients.get(player);
+
+        if (!move.equals("rock") && !move.equals("paper") && !move.equals("scissors")) {
+            if (source != null) {
+                source.sendMessage("SERVER: Invalid move. Use /rps rock, /rps paper, or /rps scissors.");
+            }
+            return;
+        }
+
+        RPSGame game = activeRPSGames.get(player);
+
+        if (game == null) {
+            if (source != null) {
+                source.sendMessage("SERVER: You are not in an active RPS challenge.");
+            }
+            return;
+        }
+
+        if (player.equals(game.player1)) {
+            game.player1Move = move;
+        } else if (player.equals(game.player2)) {
+            game.player2Move = move;
+        }
+
+        source.sendMessage("SERVER: You chose " + move + ".");
+
+        if (game.player1Move != null && game.player2Move != null) {
+            ClientHandler player1Handler = clients.get(game.player1);
+            ClientHandler player2Handler = clients.get(game.player2);
+
+            String result;
+
+            if (game.player1Move.equals(game.player2Move)) {
+                result = "SERVER: RPS result: Tie! Both players chose " + game.player1Move + ".";
+            } else if (
+                (game.player1Move.equals("rock") && game.player2Move.equals("scissors")) ||
+                (game.player1Move.equals("paper") && game.player2Move.equals("rock")) ||
+                (game.player1Move.equals("scissors") && game.player2Move.equals("paper"))
+            ) {
+                result = "SERVER: RPS result: " + game.player1 + " wins! " +
+                        game.player1Move + " beats " + game.player2Move + ".";
+            } else {
+                result = "SERVER: RPS result: " + game.player2 + " wins! " +
+                        game.player2Move + " beats " + game.player1Move + ".";
+            }
+
+            if (player1Handler != null) {
+                player1Handler.sendMessage(result);
+            }
+
+            if (player2Handler != null) {
+                player2Handler.sendMessage(result);
+            }
+
+            activeRPSGames.remove(game.player1);
+            activeRPSGames.remove(game.player2);
+        }
+    }
+
     public static void sendUserListToAll() {
         StringBuilder sb = new StringBuilder("USERLIST:");
         for (String username : clients.keySet()) {
