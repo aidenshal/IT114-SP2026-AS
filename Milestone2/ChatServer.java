@@ -6,7 +6,6 @@ public class ChatServer {
 
     private static final int PORT = 1728;
 
-    // username -> handler
     private static final ConcurrentHashMap<String, ClientHandler> clients = new ConcurrentHashMap<>();
 
     private static class RPSGame {
@@ -228,8 +227,14 @@ public class ChatServer {
 
     public static void sendUserListToAll() {
         StringBuilder sb = new StringBuilder("USERLIST:");
+
+        boolean first = true;
         for (String username : clients.keySet()) {
-            sb.append(username).append(",");
+            if (!first) {
+                sb.append(", ");
+            }
+            sb.append(username);
+            first = false;
         }
 
         String userListMessage = sb.toString();

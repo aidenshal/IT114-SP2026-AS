@@ -18,7 +18,6 @@ public class ChatClient {
             BufferedReader incoming = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter outgoing = new PrintWriter(socket.getOutputStream(), true);
 
-            // Thread to listen for messages from server
             Thread listener = new Thread(() -> {
                 try {
                     String serverMessage;
@@ -27,7 +26,12 @@ public class ChatClient {
                             System.out.print("Enter username: ");
                         } else if (serverMessage.startsWith("USERLIST:")) {
                             String users = serverMessage.substring(9);
-                            System.out.println("\nConnected users: " + users);
+
+                            if (users.isEmpty()) {
+                                System.out.println("\nConnected users: none");
+                            } else {
+                                System.out.println("\nConnected users: " + users);
+                            }
                         } else {
                             System.out.println(serverMessage);
                         }
